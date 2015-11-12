@@ -1,0 +1,74 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="title_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:layout_marginTop">@dimen/simple_margin</item>
+        <item name="android:layout_marginBottom">@dimen/simple_margin</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
+        <item name="android:typeface">monospace</item>
+    </style>
+
+    <style name="subtitle_style" parent="title_style">
+        <item name="android:textSize">20sp</item>
+        <item name="android:padding">@dimen/thin_margin</item>
+        <item name="android:layout_marginLeft">@dimen/simple_margin</item>
+        <item name="android:layout_marginRight">@dimen/simple_margin</item>
+        <item name="android:layout_marginBottom">@dimen/thin_margin</item>
+        <item name="android:layout_marginTop">@dimen/simple_margin</item>
+    </style>
+
+    <style name="input_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_margin">@dimen/simple_margin</item>
+        <item name="android:padding">@dimen/thin_margin</item>
+        <item name="android:background">@drawable/input_background</item>
+    </style>
+
+    <style name="data_style" parent="input_style">
+        <item name="android:background">@drawable/data_background</item>
+    </style>
+
+    <style name="spinner_style" parent="Widget.AppCompat.Spinner">
+        <item name="android:layout_margin">@dimen/simple_margin</item>
+    </style>
+
+    <style name="checkbox_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:checked">false</item>
+        <item name="android:layout_marginLeft">@dimen/simple_margin</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="link_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:linksClickable">true</item>
+        <item name="android:autoLink">web</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_margin">@dimen/card_margin</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:padding">@dimen/simple_margin</item>
+    </style>
+
+    <style name="button_style">
+        <item name="android:layout_margin">@dimen/simple_margin</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/accent</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+</resources>

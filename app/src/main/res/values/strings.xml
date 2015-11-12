@@ -1,0 +1,40 @@
+<resources>>
+    <string name="app_name">Fyber Challenge</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Form Strings -->
+    <string name="form_title">Form request to Fiber</string>
+    <string name="format">Format</string>
+    <string name="appid">appid</string>
+    <string name="appid_hint">157</string>
+    <string name="uid">uid</string>
+    <string name="uid_hint">player1</string>
+    <string name="locale">Locale</string>
+    <string name="os_version">OS Version</string>
+    <string name="google_ad_id">Google Ad ID</string>
+    <string name="google_ad_limited">Limited Ad Tracking</string>
+    <string name="advanced"><u>Advanced ...</u></string>
+    <string name="ip">IP</string>
+    <string name="custom_parameters">Custom (comma separated)</string>
+    <string name="custom_parameters_hint">campaign2</string>
+    <string name="page">Page</string>
+    <string name="page_hint">1</string>
+    <string name="offer_types">Offer Types (comma separated)</string>
+    <string name="offer_types_hint">112</string>
+    <string name="ps_time">Ps Time</string>
+    <string name="device">Device</string>
+    <string name="advanced_title">Advanced</string>
+
+    <string name="google_ad_id_example">38400000-8cf0-11bd-b23e-10b96e40000d</string>
+    <string name="google_ad_id_io_exception">IO Exception while trying to get the Google Advertising Info</string>
+    <string name="google_ad_id_gps_not_available_exception">Google Play Service Not Available Exception while trying to get the Google Advertising Info</string>
+    <string name="google_ad_id_gps_repairable_exception">Google Play Services Repairable Exception while trying to get the Google Advertising Info</string>
+    <string name="error_getting_ip">Exception while retrieving IP Address</string>
+    <string name="tablet">tablet</string>
+    <string name="phone">phone</string>
+    <string name="send">Send</string>
+    <string name="field_should_not_be_empty">Mandatory field</string>
+    <string name="field_should_not_be_empty_or_unchecked">Field empty. Uncheck or fill out.</string>
+    <string name="comma_separated_field_should_not_be_empty_or_unchecked">Values should be comma separated, not empty.</string>
+</resources>
