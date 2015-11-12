@@ -2,18 +2,32 @@ package codingbad.com.fyberchallenge.ui.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.view.Menu;
-import android.view.MenuItem;
+
+import java.util.List;
 
 import codingbad.com.fyberchallenge.R;
+import codingbad.com.fyberchallenge.model.Offer;
+import codingbad.com.fyberchallenge.model.OfferResponse;
+import codingbad.com.fyberchallenge.tasks.GetFyberOffersTask;
+import codingbad.com.fyberchallenge.ui.fragment.FyberErrorFragment;
+import codingbad.com.fyberchallenge.ui.fragment.FyberOffersFragment;
 import codingbad.com.fyberchallenge.ui.fragment.MainFormFragment;
+import codingbad.com.fyberchallenge.ui.fragment.NoOffersFragment;
 import roboguice.activity.RoboActionBarActivity;
 
-public class MainActivity extends RoboActionBarActivity implements MainFormFragment.Callbacks {
+public class MainActivity extends RoboActionBarActivity implements MainFormFragment.Callbacks, NoOffersFragment.Callbacks, FyberErrorFragment.Callbacks, FyberOffersFragment.Callbacks {
+
+    private static final String MAIN_FORM_FRAGMENT_TAG = "main_form_fragment";
+    private static final String OK = "OK";
+    private static final String NO_CONTENT = "NO_CONTENT";
+    private static final String NO_OFFERS_FRAGMENT_TAG = "no_offers_fragment";
+    private static final String FYBER_ERROR_FRAGMENT_TAG = "fyber_error_fragment";
+    private static final String OFFERS_FRAGMENT_TAG = "fyber_offers_fragment";
 
     private FragmentManager mFragmentManager;
-    private static final String MAIN_FORM_FRAGMENT_TAG = "main_form_fragment";
 
+    //
+    private OfferResponse mLastResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,30 +39,65 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     private void setMainFragment() {
         mFragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        startFragment.addToBackStack(MAIN_FORM_FRAGMENT_TAG);
         startFragment.add(R.id.fragment, new MainFormFragment(), MAIN_FORM_FRAGMENT_TAG);
         startFragment.commit();
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onFormSubmittedSuccessfully(OfferResponse response) {
+        if (response.getCode().equals(OK)) {
+            showOffers(response);
+        } else if (response.getCode().equals(NO_CONTENT)) {
+            showNotOffersFragment(response);
+        } else {
+            // unexpected result, do something!
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public void onFormSubmittedWithError(GetFyberOffersTask.FyberError error) {
+        showErrorFragment(error.getCode(), error.getErrorMessage());
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+    private void showErrorFragment(int code, String errorMessage) {
+        mFragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        Bundle bundle = new Bundle();
+        bundle.putInt(FyberErrorFragment.CODE, code);
+        bundle.putString(FyberErrorFragment.MESSAGE, errorMessage);
+        FyberErrorFragment fyberErrorFragment = new FyberErrorFragment();
+        fyberErrorFragment.setArguments(bundle);
+        startFragment.addToBackStack(NO_OFFERS_FRAGMENT_TAG);
+        startFragment.replace(R.id.fragment, fyberErrorFragment, FYBER_ERROR_FRAGMENT_TAG);
+        startFragment.commit();
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void showOffers(OfferResponse response) {
+        mLastResponse = response;
+        mFragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        FyberOffersFragment fyberOffersFragment = new FyberOffersFragment();
+        startFragment.addToBackStack(OFFERS_FRAGMENT_TAG);
+        startFragment.replace(R.id.fragment, fyberOffersFragment, OFFERS_FRAGMENT_TAG);
+        startFragment.commit();
+    }
+
+    private void showNotOffersFragment(OfferResponse response) {
+        mFragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        Bundle bundle = new Bundle();
+        bundle.putString(NoOffersFragment.MESSAGE, response.getMessage());
+        NoOffersFragment noOffersFragment = new NoOffersFragment();
+        noOffersFragment.setArguments(bundle);
+        startFragment.addToBackStack(NO_OFFERS_FRAGMENT_TAG);
+        startFragment.replace(R.id.fragment, noOffersFragment, NO_OFFERS_FRAGMENT_TAG);
+        startFragment.commit();
+    }
+
+    @Override
+    public List<Offer> getOffers() {
+        return mLastResponse.getOffers();
     }
 }

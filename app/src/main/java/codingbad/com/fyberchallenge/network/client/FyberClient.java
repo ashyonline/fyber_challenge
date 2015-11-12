@@ -28,7 +28,7 @@ public class FyberClient {
         }
     }
 
-    public OfferResponse getOffers(String format, int appid, String uid, String locale, String osVersion, long timestamp, String hashkey, String googleAdId, Boolean googleAdIdLimitedTrackingEnabled) {
-        return mFyberClient.getOffers(format, appid, uid, locale, osVersion, timestamp, hashkey, googleAdId, googleAdIdLimitedTrackingEnabled);
+    public OfferResponse getOffers(String format, Integer appid, String uid, String locale, String osVersion, Long timestamp, String hashkey, String googleAdId, Boolean googleAdIdLimitedTrackingEnabled, String ip, String pub0, Integer page, String offerTypes, Long psTime, String device) {
+        return mFyberClient.getOffers(format, appid, uid, locale, osVersion, timestamp, hashkey, googleAdId, googleAdIdLimitedTrackingEnabled, ip, pub0, page, offerTypes, psTime, device);
     }
 }

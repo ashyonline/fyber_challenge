@@ -10,18 +10,17 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        // Enabling multidex support.
-        multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'HOST', '"http://api.fyber.com/feed/v1"'
+            buildConfigField 'String', 'HOST', '"http://api.fyber.com"'
         }
 
         debug {
-            buildConfigField 'String', 'HOST', '"http://api.fyber.com/feed/v1"'
+            // host may be change between release and debug builds
+            buildConfigField 'String', 'HOST', '"http://api.fyber.com"'
         }
     }
 }
@@ -33,13 +32,14 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:cardview-v7:23.0.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
     compile 'com.google.android.gms:play-services:8.3.0'
     compile 'org.roboguice:roboguice:3.+'
     provided 'org.roboguice:roboblender:3.+'
     // For the optional Nullable annotation
     compile 'com.google.code.findbugs:jsr305:1.3.9'
-    compile 'com.fyber:fyber-sdk:8.0.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.4.0'
     compile 'com.squareup:otto:1.3.8'
+    compile 'com.github.bumptech.glide:glide:3.6.0'
 }

@@ -2,7 +2,11 @@ package codingbad.com.fyberchallenge.ui.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,98 +21,93 @@ import android.widget.Toast;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.inject.Inject;
+import com.squareup.otto.Subscribe;
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import codingbad.com.fyberchallenge.BuildConfig;
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.model.FyberFormModel;
+import codingbad.com.fyberchallenge.model.OfferResponse;
 import codingbad.com.fyberchallenge.model.OptionalCommaSeparatedTextViewValidator;
 import codingbad.com.fyberchallenge.model.OptionalTextViewValidator;
 import codingbad.com.fyberchallenge.model.TextViewValidator;
+import codingbad.com.fyberchallenge.otto.OttoBus;
+import codingbad.com.fyberchallenge.tasks.GetFyberOffersTask;
+import codingbad.com.fyberchallenge.ui.fragment.view.LoadingIndicatorView;
 import roboguice.inject.InjectView;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainFormFragment extends AbstractFragment<MainFormFragment.Callbacks> implements View.OnClickListener {
+    // hardcoded since I don't have an account
+    private static final String PS_TIME = "1312211903";
 
-    @InjectView(R.id.fragment_main_form_send)
-    private Button mSendForm;
+    @Inject
+    private LoadingIndicatorView mLoadingIndicator;
+
+    @Inject
+    OttoBus ottoBus;
 
     @InjectView(R.id.fragment_main_form_format)
     private Spinner mFormatSpinner;
-
     @InjectView(R.id.fragment_main_form_appid)
     private EditText mAppid;
-
     @InjectView(R.id.fragment_main_form_uid)
     private EditText mUid;
-
     @InjectView(R.id.fragment_main_form_locale)
     private Spinner mLocale;
-
     @InjectView(R.id.fragment_main_form_os_version)
     private TextView mOsVersion;
-
     @InjectView(R.id.fragment_main_form_google_ad_id)
     private TextView mGoogleAdId;
-
     @InjectView(R.id.fragment_main_form_google_ad_limited)
     private TextView mIsAdTrackingLimited;
-
     @InjectView(R.id.fragment_main_form_advanced)
     private TextView mAdvancedButton;
 
+    // Optional parameters:
     @InjectView(R.id.fragment_main_form_advanced_options)
     private LinearLayout mAdvancedOptions;
-
-    // Optional parameters:
-
     @InjectView(R.id.fragment_main_form_ip)
     private TextView mIpAddress;
-
     @InjectView(R.id.fragment_main_form_custom_parameters)
     private EditText mCustomParameters;
-
     @InjectView(R.id.fragment_main_form_page)
     private EditText mPage;
-
     @InjectView(R.id.fragment_main_form_offer_types)
     private EditText mOfferTypes;
-
     @InjectView(R.id.fragment_main_form_ps_time)
     private TextView mPsTime;
-
     @InjectView(R.id.fragment_main_form_device)
     private TextView mDeviceType;
-
     // Checkboxes to decide if optional parameter should be sent
     @InjectView(R.id.send_ip)
     private CheckBox mSendIp;
-
     @InjectView(R.id.send_custom_parameters)
     private CheckBox mSendCustomParameters;
-
     @InjectView(R.id.send_page)
     private CheckBox mSendPage;
-
     @InjectView(R.id.send_offer_types)
     private CheckBox mSendOfferTypes;
-
     @InjectView(R.id.send_ps_time)
     private CheckBox mSendPsTime;
-
     @InjectView(R.id.send_device)
     private CheckBox mSendDevice;
-
     private FyberFormModel mFyberFormModel;
+    private ViewGroup mViewGroup;
 
     public MainFormFragment() {
     }
@@ -122,16 +121,31 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setupSendFormButton();
-        initializeFormatSpinner();
-        initializeLocale();
-        initializeOsVersion();
-        initializeGoogleAdInfo();
-        initializeAdvanced();
+        setupFormatDropDown();
+        setupLocaleDropDown();
+        setupOsVersion();
+        setupeGoogleAdInfo();
+        setupAdvancedParameters();
+        setupLoadingIndicator(view);
     }
 
-    private void setupSendFormButton() {
-        mSendForm.setOnClickListener(this);
+    private void setupLoadingIndicator(View view) {
+        mViewGroup = (ViewGroup) view;
+        mLoadingIndicator.attach(mViewGroup);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ottoBus.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ottoBus.unregister(this);
+        mLoadingIndicator.dismiss();
+        mViewGroup.removeView(mLoadingIndicator);
     }
 
     private void submitFyberForm() {
@@ -145,9 +159,9 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         Boolean isLimitAdTrackingEnabled;
         String ip;
         String customParameters;
-        int page;
+        Integer page;
         String offerTypes;
-        long psTime;
+        Long psTime;
         String device;
 
         Boolean error = false;
@@ -191,16 +205,20 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
             uid = mUid.getText().toString();
             locale = mLocale.getSelectedItem().toString();
             osVersion = mOsVersion.getText().toString();
-            timestamp = System.currentTimeMillis();
+            timestamp = System.currentTimeMillis() / 1000L;
+
             googleAdId = mGoogleAdId.getText().toString();
             isLimitAdTrackingEnabled = Boolean.valueOf(mIsAdTrackingLimited.getText().toString());
 
             // populate optional parameters only if checkbox is checked
             ip = mSendIp.isChecked() ? mIpAddress.getText().toString() : null;
+            // TODO: had to hardcode this value to get some offers since there are no offers for Argentina
+            ip = "2.16.1.147";
+
             customParameters = mSendCustomParameters.isChecked() ? mCustomParameters.getText().toString() : null;
-            page = mSendPage.isChecked() ? Integer.valueOf(mPage.getText().toString()) : 1; // By default, page is 1.
+            page = mSendPage.isChecked() ? Integer.valueOf(mPage.getText().toString()) : null;
             offerTypes = mSendOfferTypes.isChecked() ? mOfferTypes.getText().toString() : null;
-            psTime = mSendPsTime.isChecked() ? Long.valueOf(mPsTime.getText().toString()) : 0;
+            psTime = mSendPsTime.isChecked() ? Long.valueOf(mPsTime.getText().toString()) : null;
             device = mSendDevice.isChecked() ? mDeviceType.getText().toString() : null;
 
             // I don't really understand where I should get the ps_time value
@@ -221,10 +239,37 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
                     psTime,
                     device
             );
+
+            // TODO: remove. This is here for debug purposes
+            Log.d("Request", BuildConfig.HOST + "?" + mFyberFormModel.getRequestBody());
+
+            mLoadingIndicator.show();
+            mFyberFormModel.submit(this.getActivity());
         }
     }
 
-    private void initializeAdvanced() {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_send) {
+            submitFyberForm();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupAdvancedParameters() {
         mAdvancedButton.setOnClickListener(this);
     }
 
@@ -237,6 +282,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     private void initializeOptionals() {
         mIpAddress.setText(getIpAddress());
         // TODO: initialize mPsTime
+        mPsTime.setText(PS_TIME);
         if (isTablet()) {
             mDeviceType.setText(getString(R.string.tablet));
         } else {
@@ -250,9 +296,9 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
 
     public String getIpAddress() {
         try {
-            for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements(); ) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
+                for (Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses(); inetAddresses.hasMoreElements(); ) {
                     InetAddress inetAddress = inetAddresses.nextElement();
 
                     // get IPV4 format
@@ -267,26 +313,28 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         return "";
     }
 
-    private void initializeGoogleAdInfo() {
+    private void setupeGoogleAdInfo() {
         new GetAdvertisingIdInfo().execute();
     }
 
-    private void initializeOsVersion() {
+    private void setupOsVersion() {
         mOsVersion.setText(android.os.Build.VERSION.RELEASE);
     }
 
-    private void initializeLocale() {
+    private void setupLocaleDropDown() {
 
         // get all available locales and populate the spinner
         Locale[] availableLocales = Locale.getAvailableLocales();
         Set<String> localeLanguages = new HashSet<>();
 
-        for (Locale locale : availableLocales)
-        {
+        for (Locale locale : availableLocales) {
             localeLanguages.add(locale.getLanguage());
         }
 
-        String[] languages = (String[]) localeLanguages.toArray(new String[localeLanguages.size()]);
+        List<String> languages = new ArrayList<>();
+        languages.addAll(localeLanguages);
+        Collections.sort(languages);
+
         ArrayAdapter<String> localeAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_dropdown_item, languages);
         mLocale.setAdapter(localeAdapter);
 
@@ -299,7 +347,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         }
     }
 
-    private void initializeFormatSpinner() {
+    private void setupFormatDropDown() {
         ArrayAdapter<CharSequence> formatsAdapter = ArrayAdapter.createFromResource(this.getActivity(),
                 R.array.formats, android.R.layout.simple_spinner_item);
         formatsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -309,16 +357,30 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fragment_main_form_send:
-                submitFyberForm();
-                break;
             case R.id.fragment_main_form_advanced:
                 showAdvancedOptions();
                 break;
         }
     }
 
+    /**
+     * Otto events
+     */
+    @Subscribe
+    public void onFormSubmitted(GetFyberOffersTask.Event event) {
+        mLoadingIndicator.dismiss();
+        callbacks.onFormSubmittedSuccessfully(event.getResult());
+    }
+
+    @Subscribe
+    public void onFormSubmittedError(GetFyberOffersTask.FyberError error) {
+        mLoadingIndicator.dismiss();
+        callbacks.onFormSubmittedWithError(error);
+    }
+
     public interface Callbacks {
+        void onFormSubmittedSuccessfully(OfferResponse response);
+        void onFormSubmittedWithError(GetFyberOffersTask.FyberError error);
     }
 
     private class GetAdvertisingIdInfo extends AsyncTask<Void, Void, Void> {

@@ -1,7 +1,6 @@
 package codingbad.com.fyberchallenge.model;
 
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 /**

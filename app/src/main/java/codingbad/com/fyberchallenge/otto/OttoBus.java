@@ -17,7 +17,7 @@ public class OttoBus extends Bus {
     }
 
     public void post(final Object event) {
-        if(Looper.myLooper() == Looper.getMainLooper()) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             super.post(event);
         } else {
             this.mainThread.post(new Runnable() {
