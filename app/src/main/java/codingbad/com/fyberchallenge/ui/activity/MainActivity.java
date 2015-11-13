@@ -41,7 +41,6 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     private void setMainFragment() {
         mFragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
-        startFragment.addToBackStack(MAIN_FORM_FRAGMENT_TAG);
         startFragment.add(R.id.fragment, new MainFormFragment(), MAIN_FORM_FRAGMENT_TAG);
         startFragment.commit();
     }
@@ -63,11 +62,11 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
         showErrorFragment(error.getCode(), error.getErrorMessage());
     }
 
-    private void showErrorFragment(int code, String errorMessage) {
+    private void showErrorFragment(String code, String errorMessage) {
         mFragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
         Bundle bundle = new Bundle();
-        bundle.putInt(FyberErrorFragment.CODE, code);
+        bundle.putString(FyberErrorFragment.CODE, code);
         bundle.putString(FyberErrorFragment.MESSAGE, errorMessage);
         FyberErrorFragment fyberErrorFragment = new FyberErrorFragment();
         fyberErrorFragment.setArguments(bundle);

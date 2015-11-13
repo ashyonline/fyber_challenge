@@ -7,15 +7,15 @@ import com.google.gson.annotations.SerializedName;
  */
 public class FyberErrorModel {
     @SerializedName("code")
-    private int mCode;
-    @SerializedName("error")
+    private String mCode;
+    @SerializedName("message")
     private String mErrorDetails;
 
-    public FyberErrorModel(int code, String errorMessage) {
+    public FyberErrorModel(String code, String errorMessage) {
         mCode = code;
         mErrorDetails = errorMessage;
     }
-    public int getCode() {
+    public String getCode() {
         return mCode;
     }
 

@@ -1,17 +1,21 @@
 package codingbad.com.fyberchallenge.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by ayi on 11/12/15.
  */
 public class Thumbnail {
-    private String lowres;
-    private String hires;
+    @SerializedName("lowres")
+    private String mLowres;
+    @SerializedName("hires")
+    private String mHires;
 
     public String getLowres() {
-        return lowres;
+        return mLowres;
     }
 
     public String getHires() {
-        return hires;
+        return mHires;
     }
 }

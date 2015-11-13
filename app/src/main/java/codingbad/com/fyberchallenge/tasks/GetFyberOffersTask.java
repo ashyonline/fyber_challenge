@@ -127,7 +127,7 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
                         e2.printStackTrace();
                     }
                 } else {
-                    ottoBus.post(new FyberError(status, context.getString(R.string.unexpected_error)));
+                    ottoBus.post(new FyberError(String.valueOf(status), context.getString(R.string.unexpected_error)));
                 }
             } else {
                 super.onException(e);
@@ -161,7 +161,7 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
             mFyberErrorModel = fyberError;
         }
 
-        public FyberError(int code, String error) {
+        public FyberError(String code, String error) {
             mFyberErrorModel = new FyberErrorModel(code, error);
         }
 
@@ -169,7 +169,7 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
             return mFyberErrorModel.getErrorDetais();
         }
 
-        public int getCode() {
+        public String getCode() {
             return mFyberErrorModel.getCode();
         }
     }

@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -40,12 +39,12 @@ import codingbad.com.fyberchallenge.BuildConfig;
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.model.FyberFormModel;
 import codingbad.com.fyberchallenge.model.OfferResponse;
-import codingbad.com.fyberchallenge.model.OptionalCommaSeparatedTextViewValidator;
-import codingbad.com.fyberchallenge.model.OptionalTextViewValidator;
-import codingbad.com.fyberchallenge.model.TextViewValidator;
+import codingbad.com.fyberchallenge.model.validator.OptionalCommaSeparatedTextViewValidator;
+import codingbad.com.fyberchallenge.model.validator.OptionalTextViewValidator;
+import codingbad.com.fyberchallenge.model.validator.TextViewValidator;
 import codingbad.com.fyberchallenge.otto.OttoBus;
 import codingbad.com.fyberchallenge.tasks.GetFyberOffersTask;
-import codingbad.com.fyberchallenge.ui.fragment.view.LoadingIndicatorView;
+import codingbad.com.fyberchallenge.ui.view.LoadingIndicatorView;
 import roboguice.inject.InjectView;
 
 /**

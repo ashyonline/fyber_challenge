@@ -1,9 +1,13 @@
 package codingbad.com.fyberchallenge.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by ayi on 11/12/15.
  */
 public class OfferType {
-    private String offer_type_id;
-    private String readable;
+    @SerializedName("offer_type_id")
+    private String mOfferTypeId;
+    @SerializedName("readable")
+    private String mReadable;
 }

@@ -1,4 +1,4 @@
-package codingbad.com.fyberchallenge.model;
+package codingbad.com.fyberchallenge.model.validator;
 
 import android.widget.CheckBox;
 import android.widget.TextView;

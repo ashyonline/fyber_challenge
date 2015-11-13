@@ -1,4 +1,4 @@
-package codingbad.com.fyberchallenge.ui.fragment.view;
+package codingbad.com.fyberchallenge.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

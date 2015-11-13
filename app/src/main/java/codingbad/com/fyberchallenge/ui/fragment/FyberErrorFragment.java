@@ -19,7 +19,7 @@ public class FyberErrorFragment extends AbstractFragment<NoOffersFragment.Callba
     public static final String MESSAGE = "error_message";
 
     private String mErrorMessage;
-    private int mErrorCode;
+    private String mErrorCode;
 
     @InjectView(R.id.fragment_fyber_error_message)
     private TextView mErrorMessageTextView;
@@ -34,7 +34,7 @@ public class FyberErrorFragment extends AbstractFragment<NoOffersFragment.Callba
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mErrorCode = getArguments().getInt(CODE);
+        mErrorCode = getArguments().getString(CODE);
         mErrorMessage = getArguments().getString(MESSAGE);
         return inflater.inflate(R.layout.fragment_fyber_error, container, false);
     }
@@ -42,7 +42,7 @@ public class FyberErrorFragment extends AbstractFragment<NoOffersFragment.Callba
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mErrorCodeTextView.setText(String.valueOf(mErrorCode));
+        mErrorCodeTextView.setText(mErrorCode);
         mErrorMessageTextView.setText(mErrorMessage);
     }
 

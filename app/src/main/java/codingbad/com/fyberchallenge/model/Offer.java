@@ -1,5 +1,7 @@
 package codingbad.com.fyberchallenge.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -7,33 +9,42 @@ import java.util.List;
  * Created by ayi on 11/12/15.
  */
 public class Offer implements Serializable {
-    private String link;
-    private String title;
-    private int offer_id;
-    private String teaser;
-    private String required_actions;
-    private Thumbnail thumbnail;
-    private List<OfferType> offer_types;
-    private String payout;
-    private TimeToPayOut time_to_payout;
+    @SerializedName("link")
+    private String mLink;
+    @SerializedName("title")
+    private String mTitle;
+    @SerializedName("offer_id")
+    private int mOfferId;
+    @SerializedName("teaser")
+    private String mTeaser;
+    @SerializedName("required_actions")
+    private String mRequiredActions;
+    @SerializedName("thumbnail")
+    private Thumbnail mThumbnail;
+    @SerializedName("offer_types")
+    private List<OfferType> mOfferTypes;
+    @SerializedName("payout")
+    private String mPayout;
+    @SerializedName("time_to_payout")
+    private TimeToPayOut mTimeToPayout;
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public String getLowresThumbnailUrl() {
-        return thumbnail.getLowres();
+        return mThumbnail.getLowres();
     }
 
     public String getHiresThumbnailUrl() {
-        return thumbnail.getHires();
+        return mThumbnail.getHires();
     }
 
     public String getTeaser() {
-        return teaser;
+        return mTeaser;
     }
 
     public String getPayout() {
-        return payout;
+        return mPayout;
     }
 }
