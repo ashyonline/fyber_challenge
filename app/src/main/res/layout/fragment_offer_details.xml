@@ -39,7 +39,6 @@
                 <TextView
                     android:id="@+id/fragment_offer_details_title_value"
                     style="@style/data_style"
-                    android:text="Catz Target"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2" />
@@ -61,7 +60,6 @@
                 <TextView
                     android:id="@+id/fragment_offer_details_teaser_value"
                     style="@style/data_style"
-                    android:text="Download and START"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2" />
@@ -84,7 +82,6 @@
                     android:id="@+id/fragment_offer_details_payout_value"
                     style="@style/data_style"
                     android:layout_width="0dp"
-                    android:text="10"
                     android:layout_height="wrap_content"
                     android:layout_weight="2" />
             </LinearLayout>
