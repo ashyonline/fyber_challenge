@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.utils.ViewUtils;
@@ -47,11 +47,10 @@ public class OfferView extends LinearLayout {
 
         int size = getResources().getDimensionPixelSize(R.dimen.icon_size);
 
-        Glide.with(getContext())
+        Picasso.with(getContext())
                 .load(url)
                 .centerCrop()
-                .crossFade()
-                .override(size, size)
+                .resize(size, size)
                 .placeholder(R.drawable.ic_send)
                 .into(mIcon);
     }
