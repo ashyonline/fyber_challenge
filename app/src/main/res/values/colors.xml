@@ -9,6 +9,6 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
-    <color name="card_background">#cecece</color>
+    <color name="card_background">@color/primary_light</color>
 
 </resources>

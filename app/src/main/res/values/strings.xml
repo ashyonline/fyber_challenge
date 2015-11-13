@@ -36,4 +36,7 @@
     <string name="field_should_not_be_empty_or_unchecked">Field empty. Uncheck or fill out.</string>
     <string name="comma_separated_field_should_not_be_empty_or_unchecked">Values should be comma separated, not empty.</string>
     <string name="unexpected_error">Unexpected Error</string>
+    <string name="title">Title:</string>
+    <string name="payout">Payout:</string>
+    <string name="teaser">Teaser:</string>
 </resources>

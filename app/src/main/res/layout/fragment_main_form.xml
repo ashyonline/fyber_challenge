@@ -22,9 +22,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/form_title" />
-            <android.support.v7.widget.CardView
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                card_view:cardElevation="@dimen/card_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -168,8 +170,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textSize="@dimen/small_subtitle"
-                            android:text="@string/google_ad_limited" />
+                            android:text="@string/google_ad_limited"
+                            android:textSize="@dimen/small_subtitle" />
 
                         <TextView
                             android:id="@+id/fragment_main_form_google_ad_limited"
@@ -190,19 +192,22 @@
                         android:id="@+id/fragment_main_form_advanced_options"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:layout_marginBottom="@dimen/card_margin"
+                        android:orientation="vertical"
                         android:visibility="gone">
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@android:color/darker_gray"/>
+                            android:background="@android:color/darker_gray" />
+
                         <TextView
                             android:id="@+id/fragment_main_form_advanced_title"
                             style="@style/subtitle_style"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/advanced_title" />
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -210,19 +215,21 @@
 
                             <CheckBox
                                 android:id="@+id/send_ip"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
                                 android:text="@string/ip" />
-                            <TextView
+
+                            <EditText
                                 android:id="@+id/fragment_main_form_ip"
-                                style="@style/data_style"
+                                style="@style/input_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="2"/>
+                                android:layout_weight="2" />
                         </LinearLayout>
                         <!-- User should enter custom parameters as comma separated values. I know I can do better, but should have more time -->
                         <LinearLayout
@@ -232,14 +239,16 @@
 
                             <CheckBox
                                 android:id="@+id/send_custom_parameters"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:textSize="@dimen/small_subtitle"
-                                android:text="@string/custom_parameters" />
+                                android:text="@string/custom_parameters"
+                                android:textSize="@dimen/small_subtitle" />
+
                             <EditText
                                 android:id="@+id/fragment_main_form_custom_parameters"
                                 style="@style/input_style"
@@ -249,19 +258,23 @@
                                 android:hint="@string/custom_parameters_hint"
                                 android:inputType="text" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <CheckBox
                                 android:id="@+id/send_page"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
                                 android:text="@string/page" />
+
                             <EditText
                                 android:id="@+id/fragment_main_form_page"
                                 style="@style/input_style"
@@ -269,72 +282,83 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
                                 android:hint="@string/page_hint"
-                                android:inputType="number"/>
+                                android:inputType="number" />
                         </LinearLayout>
                         <!-- User should enter offer types as comma separated values -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <CheckBox
                                 android:id="@+id/send_offer_types"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
-                                android:textSize="@dimen/small_subtitle"
-                                android:text="@string/offer_types" />
+                                android:text="@string/offer_types"
+                                android:textSize="@dimen/small_subtitle" />
+
                             <EditText
                                 android:id="@+id/fragment_main_form_offer_types"
                                 style="@style/input_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
+                                android:digits="0,1,2,3,4,5,6,7,8,9,,"
                                 android:hint="@string/offer_types_hint"
-                                android:inputType="number"
-                                android:digits="0,1,2,3,4,5,6,7,8,9,,"/>
+                                android:inputType="number" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <CheckBox
                                 android:id="@+id/send_ps_time"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
                                 android:text="@string/ps_time" />
+
                             <TextView
                                 android:id="@+id/fragment_main_form_ps_time"
                                 style="@style/data_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="2"/>
+                                android:layout_weight="2" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <CheckBox
                                 android:id="@+id/send_device"
-                                style="@style/checkbox_style"/>
+                                style="@style/checkbox_style" />
+
                             <TextView
                                 style="@style/subtitle_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="2"
                                 android:text="@string/device" />
+
                             <TextView
                                 android:id="@+id/fragment_main_form_device"
                                 style="@style/data_style"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="2"/>
+                                android:layout_weight="2" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

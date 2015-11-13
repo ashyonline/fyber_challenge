@@ -10,4 +10,8 @@ public class Thumbnail {
     public String getLowres() {
         return lowres;
     }
+
+    public String getHires() {
+        return hires;
+    }
 }

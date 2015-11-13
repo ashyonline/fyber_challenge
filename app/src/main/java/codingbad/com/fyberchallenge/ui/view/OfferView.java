@@ -38,7 +38,7 @@ public class OfferView extends LinearLayout {
     }
 
     private void init() {
-        inflate(getContext(), R.layout.offer_view, this);
+        inflate(getContext(), R.layout.view_offer, this);
         ViewUtils.reallyInjectViews(this);
     }
 

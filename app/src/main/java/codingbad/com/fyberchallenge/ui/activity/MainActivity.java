@@ -13,6 +13,7 @@ import codingbad.com.fyberchallenge.ui.fragment.FyberErrorFragment;
 import codingbad.com.fyberchallenge.ui.fragment.FyberOffersFragment;
 import codingbad.com.fyberchallenge.ui.fragment.MainFormFragment;
 import codingbad.com.fyberchallenge.ui.fragment.NoOffersFragment;
+import codingbad.com.fyberchallenge.ui.fragment.OfferDetailDialogFragment;
 import roboguice.activity.RoboActionBarActivity;
 
 public class MainActivity extends RoboActionBarActivity implements MainFormFragment.Callbacks, NoOffersFragment.Callbacks, FyberErrorFragment.Callbacks, FyberOffersFragment.Callbacks {
@@ -23,6 +24,7 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     private static final String NO_OFFERS_FRAGMENT_TAG = "no_offers_fragment";
     private static final String FYBER_ERROR_FRAGMENT_TAG = "fyber_error_fragment";
     private static final String OFFERS_FRAGMENT_TAG = "fyber_offers_fragment";
+    private static final String OFFER_DETAIL_DIALOG_TAG = "offer_detail_dialog";
 
     private FragmentManager mFragmentManager;
 
@@ -99,5 +101,16 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     @Override
     public List<Offer> getOffers() {
         return mLastResponse.getOffers();
+    }
+
+    @Override
+    public void showDetails(Offer offer) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        OfferDetailDialogFragment addParticipantDialog = new OfferDetailDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(OfferDetailDialogFragment.OFFER, offer);
+        addParticipantDialog.setArguments(bundle);
+        addParticipantDialog.show(fragmentManager, OFFER_DETAIL_DIALOG_TAG);
+
     }
 }

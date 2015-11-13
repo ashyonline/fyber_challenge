@@ -1,11 +1,12 @@
 package codingbad.com.fyberchallenge.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by ayi on 11/12/15.
  */
-public class Offer {
+public class Offer implements Serializable {
     private String link;
     private String title;
     private int offer_id;
@@ -22,5 +23,17 @@ public class Offer {
 
     public String getLowresThumbnailUrl() {
         return thumbnail.getLowres();
+    }
+
+    public String getHiresThumbnailUrl() {
+        return thumbnail.getHires();
+    }
+
+    public String getTeaser() {
+        return teaser;
+    }
+
+    public String getPayout() {
+        return payout;
     }
 }

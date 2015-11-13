@@ -7,4 +7,5 @@
     <dimen name="thin_margin">5dp</dimen>
     <dimen name="small_subtitle">16sp</dimen>
     <dimen name="icon_size">64dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources>

@@ -82,7 +82,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     @InjectView(R.id.fragment_main_form_advanced_options)
     private LinearLayout mAdvancedOptions;
     @InjectView(R.id.fragment_main_form_ip)
-    private TextView mIpAddress;
+    private EditText mIpAddress;
     @InjectView(R.id.fragment_main_form_custom_parameters)
     private EditText mCustomParameters;
     @InjectView(R.id.fragment_main_form_page)
@@ -201,24 +201,22 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
 
         if (!error) {
             format = mFormatSpinner.getSelectedItem().toString();
-            appid = Integer.valueOf(mAppid.getText().toString());
+            appid = Integer.parseInt(mAppid.getText().toString());
             uid = mUid.getText().toString();
             locale = mLocale.getSelectedItem().toString();
             osVersion = mOsVersion.getText().toString();
             timestamp = System.currentTimeMillis() / 1000L;
 
             googleAdId = mGoogleAdId.getText().toString();
-            isLimitAdTrackingEnabled = Boolean.valueOf(mIsAdTrackingLimited.getText().toString());
+            isLimitAdTrackingEnabled = Boolean.parseBoolean(mIsAdTrackingLimited.getText().toString());
 
             // populate optional parameters only if checkbox is checked
             ip = mSendIp.isChecked() ? mIpAddress.getText().toString() : null;
-            // TODO: had to hardcode this value to get some offers since there are no offers for Argentina
-            ip = "2.16.1.147";
 
             customParameters = mSendCustomParameters.isChecked() ? mCustomParameters.getText().toString() : null;
-            page = mSendPage.isChecked() ? Integer.valueOf(mPage.getText().toString()) : null;
+            page = mSendPage.isChecked() ? Integer.parseInt(mPage.getText().toString()) : null;
             offerTypes = mSendOfferTypes.isChecked() ? mOfferTypes.getText().toString() : null;
-            psTime = mSendPsTime.isChecked() ? Long.valueOf(mPsTime.getText().toString()) : null;
+            psTime = mSendPsTime.isChecked() ? Long.parseLong(mPsTime.getText().toString()) : null;
             device = mSendDevice.isChecked() ? mDeviceType.getText().toString() : null;
 
             // I don't really understand where I should get the ps_time value

@@ -52,10 +52,12 @@ public class FyberOffersFragment extends AbstractFragment<FyberOffersFragment.Ca
 
     @Override
     public void onItemClickListener(View view, int position) {
-
+        callbacks.showDetails(mOfferAdapter.getItemAtPosition(position));
     }
 
     public interface Callbacks {
         List<Offer> getOffers();
+
+        void showDetails(Offer offer);
     }
 }
