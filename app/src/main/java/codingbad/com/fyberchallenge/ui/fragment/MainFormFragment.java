@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import codingbad.com.fyberchallenge.BuildConfig;
+import codingbad.com.fyberchallenge.FyberChallengeApplication;
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.model.FyberFormModel;
 import codingbad.com.fyberchallenge.model.OfferResponse;
@@ -108,6 +109,9 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     private FyberFormModel mFyberFormModel;
     private ViewGroup mViewGroup;
 
+    private static String sGoogleAdvertisingId;
+    private static boolean sIsLimited = true;
+
     public MainFormFragment() {
     }
 
@@ -123,7 +127,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         setupFormatDropDown();
         setupLocaleDropDown();
         setupOsVersion();
-        setupeGoogleAdInfo();
+        setupGoogleAdInfo();
         setupAdvancedParameters();
         setupLoadingIndicator(view);
     }
@@ -248,6 +252,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         inflater.inflate(R.menu.menu_main, menu);
     }
 
@@ -310,8 +315,13 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         return "";
     }
 
-    private void setupeGoogleAdInfo() {
-        new GetAdvertisingIdInfo().execute();
+    private void setupGoogleAdInfo() {
+           if (sGoogleAdvertisingId == null) {
+               new GetAdvertisingIdInfo().execute();
+           } else {
+               mGoogleAdId.setText(sGoogleAdvertisingId);
+               mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
+           }
     }
 
     private void setupOsVersion() {
@@ -382,16 +392,12 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
 
     private class GetAdvertisingIdInfo extends AsyncTask<Void, Void, Void> {
         private String mErrorMsg;
-        private String mGoogleAdvertisingId = getString(R.string.google_ad_id_example);
-        private boolean mIsLimited = true;
 
         @Override
         protected Void doInBackground(Void... params) {
-
-
             try {
-                mGoogleAdvertisingId = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).getId();
-                mIsLimited = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).isLimitAdTrackingEnabled();
+                sGoogleAdvertisingId = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).getId();
+                sIsLimited = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).isLimitAdTrackingEnabled();
             } catch (IOException e) {
                 mErrorMsg = getString(R.string.google_ad_id_io_exception);
             } catch (GooglePlayServicesNotAvailableException e) {
@@ -408,8 +414,8 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mGoogleAdId.setText(mGoogleAdvertisingId);
-            mIsAdTrackingLimited.setText(String.valueOf(mIsLimited));
+            mGoogleAdId.setText(sGoogleAdvertisingId);
+            mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
 
             if (mErrorMsg != null) {
                 Toast.makeText(getContext(), mErrorMsg, Toast.LENGTH_SHORT).show();

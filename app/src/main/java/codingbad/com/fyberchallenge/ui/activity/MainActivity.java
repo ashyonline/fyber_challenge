@@ -70,7 +70,7 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
         bundle.putString(FyberErrorFragment.MESSAGE, errorMessage);
         FyberErrorFragment fyberErrorFragment = new FyberErrorFragment();
         fyberErrorFragment.setArguments(bundle);
-        startFragment.addToBackStack(NO_OFFERS_FRAGMENT_TAG);
+        startFragment.addToBackStack(FYBER_ERROR_FRAGMENT_TAG);
         startFragment.replace(R.id.fragment, fyberErrorFragment, FYBER_ERROR_FRAGMENT_TAG);
         startFragment.commit();
     }
