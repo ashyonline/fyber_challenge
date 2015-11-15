@@ -401,6 +401,12 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     }
 
     @Subscribe
+    public void onNoValidHashInResponse(GetFyberOffersTask.NoValidHashEvent noValidHash) {
+        mLoadingIndicator.dismiss();
+        callbacks.onFormSubmittedWithError(noValidHash);
+    }
+
+    @Subscribe
     public void onFormSubmittedError(GetFyberOffersTask.FyberError error) {
         mLoadingIndicator.dismiss();
         callbacks.onFormSubmittedWithError(error);

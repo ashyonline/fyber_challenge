@@ -2,21 +2,31 @@ package codingbad.com.fyberchallenge.tasks;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
+
 import javax.inject.Inject;
 
+import codingbad.com.fyberchallenge.FyberChallengeApplication;
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.model.FyberErrorModel;
 import codingbad.com.fyberchallenge.model.OfferResponse;
 import codingbad.com.fyberchallenge.network.client.FyberClient;
 import codingbad.com.fyberchallenge.otto.OttoBus;
+import codingbad.com.fyberchallenge.utils.StringUtils;
 import retrofit.RetrofitError;
+import retrofit.client.Header;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
 import roboguice.util.RoboAsyncTask;
 
 /**
  * Created by ayi on 11/11/15.
  */
-public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
+public class GetFyberOffersTask extends RoboAsyncTask<Response> {
 
+    private static final String HASH_NAME = "X-Sponsorpay-Response-Signature";
     private final String mFormat;
     private final Integer mAppid;
     private final String mUid;
@@ -73,9 +83,9 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
     }
 
     @Override
-    public OfferResponse call() throws Exception {
+    public Response call() throws Exception {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        return mFyberClient.getOffers(mFormat,
+        Response response = mFyberClient.getOffers(mFormat,
                 mAppid,
                 mUid,
                 mLocale,
@@ -91,15 +101,44 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
                 mPsTime,
                 mDevice
         );
+        return response;
     }
 
     @Override
-    protected void onSuccess(OfferResponse result) throws Exception {
+    protected void onSuccess(Response result) throws Exception {
         super.onSuccess(result);
-        if (!isCancelled()) {
-            ottoBus.post(new Event(result));
+        if (validateHash(result)) {
+            GsonConverter converter = new GsonConverter(new Gson());
+            OfferResponse offerResponse = (OfferResponse) converter.fromBody(result.getBody(), OfferResponse.class);
+            if (!isCancelled()) {
+                ottoBus.post(new Event(offerResponse));
+            }
+        } else {
+            ottoBus.post(new NoValidHashEvent());
         }
 
+    }
+
+    private boolean validateHash(Response result) {
+        String stringBody = "";
+        try {
+            stringBody = StringUtils.convertToString(result.getBody().in());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String hash = getHeader(HASH_NAME, result);
+        String sha1 = StringUtils.calculateSha1(stringBody + FyberChallengeApplication.getApiKey());
+        return hash.equals(sha1);
+    }
+
+    private String getHeader(String hashName, Response result) {
+        for (Header header : result.getHeaders()) {
+            if (header.getName().equals(hashName)) {
+                return header.getValue();
+            }
+        }
+        return "";
     }
 
     @Override
@@ -161,6 +200,12 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
 
         public String getCode() {
             return mFyberErrorModel.getCode();
+        }
+    }
+
+    public class NoValidHashEvent extends FyberError {
+        public NoValidHashEvent() {
+            super(context.getString(R.string.no_valid_hash_title), context.getString(R.string.no_valid_hash_body));
         }
     }
 }

@@ -2,9 +2,6 @@ package codingbad.com.fyberchallenge.model;
 
 import android.content.Context;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +9,7 @@ import java.util.List;
 
 import codingbad.com.fyberchallenge.FyberChallengeApplication;
 import codingbad.com.fyberchallenge.tasks.GetFyberOffersTask;
+import codingbad.com.fyberchallenge.utils.StringUtils;
 
 /**
  * Created by ayi on 11/11/15.
@@ -129,40 +127,6 @@ public class FyberFormModel {
         mHashKey = calculateHashKey();
     }
 
-    private static String convertToHex(byte[] data) {
-        StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int twoHalfs = 0;
-            do {
-                if ((0 <= halfbyte) && (halfbyte <= 9)) {
-                    stringBuffer.append((char) ('0' + halfbyte));
-                } else {
-                    stringBuffer.append((char) ('a' + (halfbyte - 10)));
-                }
-                halfbyte = data[i] & 0x0F;
-            } while (twoHalfs++ < 1);
-        }
-        return stringBuffer.toString();
-    }
-
-    protected static String calculateSha1(String text) {
-        MessageDigest messageDigest = null;
-        try {
-            messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(text.getBytes("iso-8859-1"), 0, text.length());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        byte[] sha1hash = messageDigest.digest();
-        return convertToHex(sha1hash);
-    }
-
     private String[] getCommaSeparatedParams(String customParameters) {
         if (customParameters == null) {
             return null;
@@ -179,7 +143,7 @@ public class FyberFormModel {
         concatenatedExistingParams = concatenatedExistingParams + AND + FyberChallengeApplication.getApiKey();
 
         // 5. Hash the whole resulting string, using SHA1.
-        return calculateSha1(concatenatedExistingParams);
+        return StringUtils.calculateSha1(concatenatedExistingParams);
     }
 
     protected String getConcatenatedParams() {

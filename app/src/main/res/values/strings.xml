@@ -39,4 +39,6 @@
     <string name="title">Title:</string>
     <string name="payout">Payout:</string>
     <string name="teaser">Teaser:</string>
+    <string name="no_valid_hash_title">No valid hash in the response</string>
+    <string name="no_valid_hash_body">This hash is used to ensure the integrity and validity of the response, we are adding a special security parameter to the HTTP response header</string>
 </resources>
