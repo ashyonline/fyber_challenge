@@ -1,8 +1,8 @@
 package codingbad.com.fyberchallenge.ui.fragment;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import codingbad.com.fyberchallenge.BuildConfig;
-import codingbad.com.fyberchallenge.FyberChallengeApplication;
 import codingbad.com.fyberchallenge.R;
 import codingbad.com.fyberchallenge.model.FyberFormModel;
 import codingbad.com.fyberchallenge.model.OfferResponse;
@@ -54,13 +52,13 @@ import roboguice.inject.InjectView;
 public class MainFormFragment extends AbstractFragment<MainFormFragment.Callbacks> implements View.OnClickListener {
     // hardcoded since I don't have an account
     private static final String PS_TIME = "1312211903";
-
-    @Inject
-    private LoadingIndicatorView mLoadingIndicator;
-
+    private static final java.lang.String ADVANCED_BUTTON_CLICKED = "advanced_button_clicked";
+    private static String sGoogleAdvertisingId;
+    private static boolean sIsLimited = true;
     @Inject
     OttoBus ottoBus;
-
+    @Inject
+    private LoadingIndicatorView mLoadingIndicator;
     @InjectView(R.id.fragment_main_form_format)
     private Spinner mFormatSpinner;
     @InjectView(R.id.fragment_main_form_appid)
@@ -77,7 +75,6 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     private TextView mIsAdTrackingLimited;
     @InjectView(R.id.fragment_main_form_advanced)
     private TextView mAdvancedButton;
-
     // Optional parameters:
     @InjectView(R.id.fragment_main_form_advanced_options)
     private LinearLayout mAdvancedOptions;
@@ -108,9 +105,8 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     private CheckBox mSendDevice;
     private FyberFormModel mFyberFormModel;
     private ViewGroup mViewGroup;
-
-    private static String sGoogleAdvertisingId;
-    private static boolean sIsLimited = true;
+    private boolean mAdvancedButtonStatus;
+    private View mView;
 
     public MainFormFragment() {
     }
@@ -118,6 +114,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_main_form, container, false);
     }
 
@@ -130,6 +127,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         setupGoogleAdInfo();
         setupAdvancedParameters();
         setupLoadingIndicator(view);
+        setupOptionals();
     }
 
     private void setupLoadingIndicator(View view) {
@@ -241,12 +239,36 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
                     device
             );
 
-            // TODO: remove. This is here for debug purposes
-            Log.d("Request", BuildConfig.HOST + "?" + mFyberFormModel.getRequestBody());
-
             mLoadingIndicator.show();
             mFyberFormModel.submit(this.getActivity());
         }
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            mAdvancedButtonStatus = savedInstanceState.getBoolean(ADVANCED_BUTTON_CLICKED);
+            if (mAdvancedButtonStatus) {
+                showAdvancedOptions();
+            }
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(ADVANCED_BUTTON_CLICKED, mAdvancedButtonStatus);
     }
 
     @Override
@@ -276,14 +298,12 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     }
 
     private void showAdvancedOptions() {
-        initializeOptionals();
         mAdvancedOptions.setVisibility(View.VISIBLE);
         mAdvancedButton.setVisibility(View.GONE);
     }
 
-    private void initializeOptionals() {
+    private void setupOptionals() {
         mIpAddress.setText(getIpAddress());
-        // TODO: initialize mPsTime
         mPsTime.setText(PS_TIME);
         if (isTablet()) {
             mDeviceType.setText(getString(R.string.tablet));
@@ -316,12 +336,12 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     }
 
     private void setupGoogleAdInfo() {
-           if (sGoogleAdvertisingId == null) {
-               new GetAdvertisingIdInfo().execute();
-           } else {
-               mGoogleAdId.setText(sGoogleAdvertisingId);
-               mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
-           }
+        if (sGoogleAdvertisingId == null) {
+            new GetAdvertisingIdInfo().execute();
+        } else {
+            mGoogleAdId.setText(sGoogleAdvertisingId);
+            mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
+        }
     }
 
     private void setupOsVersion() {
@@ -365,6 +385,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_main_form_advanced:
+                mAdvancedButtonStatus = true;
                 showAdvancedOptions();
                 break;
         }
@@ -374,7 +395,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
      * Otto events
      */
     @Subscribe
-    public void onFormSubmitted(GetFyberOffersTask.Event event) {
+    public void onFormSuccessfullySubmitted(GetFyberOffersTask.Event event) {
         mLoadingIndicator.dismiss();
         callbacks.onFormSubmittedSuccessfully(event.getResult());
     }
@@ -387,6 +408,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
 
     public interface Callbacks {
         void onFormSubmittedSuccessfully(OfferResponse response);
+
         void onFormSubmittedWithError(GetFyberOffersTask.FyberError error);
     }
 

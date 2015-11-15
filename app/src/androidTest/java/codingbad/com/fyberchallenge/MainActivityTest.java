@@ -1,8 +1,14 @@
 package codingbad.com.fyberchallenge;
 
 import android.content.pm.ActivityInfo;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.GeneralLocation;
+import android.support.test.espresso.action.GeneralSwipeAction;
+import android.support.test.espresso.action.Press;
+import android.support.test.espresso.action.Swipe;
 import android.support.test.espresso.assertion.ViewAssertions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.widget.EditText;
@@ -30,6 +36,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Created by ayi on 11/13/15.
@@ -47,6 +54,27 @@ public class MainActivityTest {
     @Rule
     public final ActivityRule<MainActivity> main = new ActivityRule<>(MainActivity.class);
 
+    private static Matcher<? super View> hasErrorText() {
+        return new ErrorTextMatcher();
+    }
+
+    /**
+     * Check if Advanced options we being displayed, there keep being displayed after screen rotation
+     */
+    /*
+    @Test
+    public void testWhenDeviceRotatesAdvancedOptionsKeepDisplaying() {
+        pressAdvancedButton();
+        onView(withText(R.string.ip)).perform(scrollTo()).check(ViewAssertions.matches(isDisplayed()));
+        rotateDevice();
+        onView(R.id.fragment_main_form_ip).perform(scrollTo()).check(ViewAssertions.matches(isDisplayed()));
+    }
+    */
+    public static ViewAction swipeDown() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.TOP_CENTER,
+                GeneralLocation.BOTTOM_CENTER, Press.FINGER);
+    }
+
     /**
      * This class shows some basic UI tests for illustrative purposes.
      * A complete UI test set would take more than a couple of hours.
@@ -61,22 +89,17 @@ public class MainActivityTest {
 
     @Test
     public void testStaticTexts() {
-        testDisplay(R.id.fragment_main_form_title);
+        // title
+        testDisplayWithId(R.id.fragment_main_form_title);
         // subtitles
-
-        testDisplay(R.string.form_title);
-        testDisplay(R.string.format);
-        testDisplay(R.string.appid);
-        testDisplay(R.string.uid);
-        testDisplay(R.string.locale);
-        // testDisplay(R.string.os_version);
-        testDisplay(R.string.google_ad_id);
-        testDisplay(R.string.google_ad_limited);
-    }
-
-    private void testDisplay(int textId) {
-        onView(withText(textId)).perform(scrollTo()).check(ViewAssertions.matches(isDisplayed()));
-
+        testDisplayWithText(R.string.form_title);
+        testDisplayWithText(R.string.format);
+        testDisplayWithText(R.string.appid);
+        testDisplayWithText(R.string.uid);
+        testDisplayWithText(R.string.locale);
+        testDisplayWithText(R.string.os_version);
+        testDisplayWithText(R.string.google_ad_id);
+        testDisplayWithText(R.string.google_ad_limited);
     }
 
     @Test
@@ -151,20 +174,65 @@ public class MainActivityTest {
         checkEditTextError(R.id.fragment_main_form_appid);
     }
 
+    @Test
+    public void testNonMandatoryParameters() {
+        pressAdvancedButton();
+        ViewInteraction ipEditText = onView(withId(R.id.fragment_main_form_ip));
+        ipEditText.perform(scrollTo(), clearText());
+        ipEditText.check(ViewAssertions.matches(not(hasErrorText())));
+        sendForm();
+        onView(withId(R.id.send_ip)).perform(scrollTo()).perform(click());
+        sendForm();
+        ipEditText.check(ViewAssertions.matches(hasErrorText()));
+    }
+
     private void checkEditTextError(int id) {
-        ViewInteraction editText = onView(withId(R.id.fragment_main_form_ip));
+        ViewInteraction editText = onView(withId(id));
         editText.perform(clearText());
-        onView(withId(R.id.action_send)).perform(click());
+        sendForm();
         editText.check(ViewAssertions.matches(hasErrorText()));
     }
 
+    private void sendForm() {
+        onView(withId(R.id.action_send)).perform(click());
+    }
+
     @Test
-    public void shouldShowErrorMainFormTitle() {
+    public void testShouldShowMainFormTitle() {
         onView(withId(R.id.fragment_main_form_title)).check(ViewAssertions.matches(isDisplayed()));
     }
 
-    private static Matcher<? super View> hasErrorText() {
-        return new ErrorTextMatcher();
+    public void setText(int id, String text) {
+        onView(ViewMatchers.withId(id)).perform(scrollTo()).perform(typeText(text));
+    }
+
+    public void checkText(int id, String text) {
+        onView(allOf(withId(id), isDisplayed())).check(matches(withText(text)));
+    }
+
+    private void testDisplayWithId(int id) {
+        onView(withId(id)).perform(scrollTo()).check(ViewAssertions.matches(isDisplayed()));
+    }
+
+    private void testDisplayWithText(int textId) {
+        onView(withText(textId)).perform(scrollTo()).check(ViewAssertions.matches(isDisplayed()));
+    }
+
+    /**
+     * This test checks that what has been typed into EditText is keep after screen rotation
+     * Incomplete, only showing some values.
+     */
+    @Test
+    public void testWhenDeviceRotatesSameTextInputIsRetained() {
+        setText(R.id.fragment_main_form_uid, UID);
+        setText(R.id.fragment_main_form_appid, APPID);
+        rotateDevice();
+        checkText(R.id.fragment_main_form_uid, UID);
+        checkText(R.id.fragment_main_form_appid, APPID);
+    }
+
+    private void rotateDevice() {
+        main.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     private static class ErrorTextMatcher extends TypeSafeMatcher<View> {
@@ -184,29 +252,5 @@ public class MainActivityTest {
         public void describeTo(Description description) {
             description.appendText("error is empty");
         }
-    }
-
-    public void setText(int id, String text) {
-        onView(withId(id)).perform(scrollTo()).perform(typeText(text));
-    }
-
-    public void checkText(int id, String text) {
-        onView(allOf(withId(id), isDisplayed())).check(matches(withText(text)));
-    }
-
-    /** This test checks that what has been typed into EditText is keep after screen rotation
-     * Incomplete, only showing some values.
-     * */
-    @Test
-    public void whenDeviceRotatesSameTextInputIsRetained() {
-        setText(R.id.fragment_main_form_uid, UID);
-        setText(R.id.fragment_main_form_appid, APPID);
-        rotateDevice();
-        checkText(R.id.fragment_main_form_uid, UID);
-        checkText(R.id.fragment_main_form_appid, APPID);
-    }
-
-    private void rotateDevice() {
-        main.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 }

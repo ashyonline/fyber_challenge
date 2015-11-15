@@ -28,8 +28,16 @@ public class Offer implements Serializable {
     @SerializedName("time_to_payout")
     private TimeToPayOut mTimeToPayout;
 
+    public void setThumbnail(Thumbnail thumbnail) {
+        mThumbnail = thumbnail;
+    }
+
     public String getTitle() {
         return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
     }
 
     public String getLowresThumbnailUrl() {
@@ -44,7 +52,15 @@ public class Offer implements Serializable {
         return mTeaser;
     }
 
+    public void setTeaser(String teaser) {
+        mTeaser = teaser;
+    }
+
     public String getPayout() {
         return mPayout;
+    }
+
+    public void setPayout(String payout) {
+        mPayout = payout;
     }
 }

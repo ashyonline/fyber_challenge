@@ -2,10 +2,12 @@ package codingbad.com.fyberchallenge.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by ayi on 11/12/15.
  */
-public class Information {
+public class Information implements Serializable {
     @SerializedName("app_name")
     private String mAppName;
     @SerializedName("appid")

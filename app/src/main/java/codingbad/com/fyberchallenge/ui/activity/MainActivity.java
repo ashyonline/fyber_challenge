@@ -1,7 +1,11 @@
 package codingbad.com.fyberchallenge.ui.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import java.util.List;
 
@@ -25,17 +29,23 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     private static final String FYBER_ERROR_FRAGMENT_TAG = "fyber_error_fragment";
     private static final String OFFERS_FRAGMENT_TAG = "fyber_offers_fragment";
     private static final String OFFER_DETAIL_DIALOG_TAG = "offer_detail_dialog";
-
-    private FragmentManager mFragmentManager;
-
+    private static final String LAST_RESPONSE = "last_response";
     //
-    private OfferResponse mLastResponse;
+    protected OfferResponse mLastResponse;
+    private FragmentManager mFragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mLastResponse = (OfferResponse) savedInstanceState.getSerializable(LAST_RESPONSE);
+        }
+
         setContentView(R.layout.activity_main);
-        setMainFragment();
+        if (getCurrentFragment() == null) {
+            setMainFragment();
+        }
     }
 
     private void setMainFragment() {
@@ -45,6 +55,9 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
         startFragment.commit();
     }
 
+    protected Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.fragment);
+    }
 
     @Override
     public void onFormSubmittedSuccessfully(OfferResponse response) {
@@ -64,7 +77,7 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
 
     private void showErrorFragment(String code, String errorMessage) {
         mFragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        FragmentTransaction startFragment = mFragmentManager.beginTransaction();
         Bundle bundle = new Bundle();
         bundle.putString(FyberErrorFragment.CODE, code);
         bundle.putString(FyberErrorFragment.MESSAGE, errorMessage);
@@ -78,7 +91,7 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     private void showOffers(OfferResponse response) {
         mLastResponse = response;
         mFragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        FragmentTransaction startFragment = mFragmentManager.beginTransaction();
         FyberOffersFragment fyberOffersFragment = new FyberOffersFragment();
         startFragment.addToBackStack(OFFERS_FRAGMENT_TAG);
         startFragment.replace(R.id.fragment, fyberOffersFragment, OFFERS_FRAGMENT_TAG);
@@ -87,7 +100,7 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
 
     private void showNotOffersFragment(OfferResponse response) {
         mFragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction startFragment = mFragmentManager.beginTransaction();
+        FragmentTransaction startFragment = mFragmentManager.beginTransaction();
         Bundle bundle = new Bundle();
         bundle.putString(NoOffersFragment.MESSAGE, response.getMessage());
         NoOffersFragment noOffersFragment = new NoOffersFragment();
@@ -103,6 +116,14 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mLastResponse != null) {
+            outState.putSerializable(LAST_RESPONSE, mLastResponse);
+        }
+    }
+
+    @Override
     public void showDetails(Offer offer) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         OfferDetailDialogFragment addParticipantDialog = new OfferDetailDialogFragment();
@@ -110,6 +131,5 @@ public class MainActivity extends RoboActionBarActivity implements MainFormFragm
         bundle.putSerializable(OfferDetailDialogFragment.OFFER, offer);
         addParticipantDialog.setArguments(bundle);
         addParticipantDialog.show(fragmentManager, OFFER_DETAIL_DIALOG_TAG);
-
     }
 }

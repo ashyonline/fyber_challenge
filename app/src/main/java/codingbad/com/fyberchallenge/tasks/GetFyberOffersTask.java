@@ -2,10 +2,6 @@ package codingbad.com.fyberchallenge.tasks;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import codingbad.com.fyberchallenge.R;
@@ -13,7 +9,6 @@ import codingbad.com.fyberchallenge.model.FyberErrorModel;
 import codingbad.com.fyberchallenge.model.OfferResponse;
 import codingbad.com.fyberchallenge.network.client.FyberClient;
 import codingbad.com.fyberchallenge.otto.OttoBus;
-import codingbad.com.fyberchallenge.utils.StringUtils;
 import retrofit.RetrofitError;
 import roboguice.util.RoboAsyncTask;
 
@@ -22,10 +17,6 @@ import roboguice.util.RoboAsyncTask;
  */
 public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
 
-    @Inject
-    protected OttoBus ottoBus;
-    @Inject
-    private FyberClient mFyberClient;
     private final String mFormat;
     private final Integer mAppid;
     private final String mUid;
@@ -41,6 +32,10 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
     private final String mOfferTypes;
     private final Long mPsTime;
     private final String mDevice;
+    @Inject
+    protected OttoBus ottoBus;
+    @Inject
+    private FyberClient mFyberClient;
 
     // first approach only accepts one custom param
     public GetFyberOffersTask(Context context,
@@ -119,13 +114,8 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
             if (e1.getResponse() != null) {
                 int status = e1.getResponse().getStatus();
                 if (status == 400 || status == 401 || status == 500) {
-                    try {
-                        String errorText = StringUtils.convertToString(e1.getResponse().getBody().in());
-                        FyberErrorModel fyberError = (FyberErrorModel) e1.getBodyAs(FyberErrorModel.class);
-                        ottoBus.post(new FyberError(fyberError));
-                    } catch (IOException e2) {
-                        e2.printStackTrace();
-                    }
+                    FyberErrorModel fyberError = (FyberErrorModel) e1.getBodyAs(FyberErrorModel.class);
+                    ottoBus.post(new FyberError(fyberError));
                 } else {
                     ottoBus.post(new FyberError(String.valueOf(status), context.getString(R.string.unexpected_error)));
                 }
@@ -144,12 +134,12 @@ public class GetFyberOffersTask extends RoboAsyncTask<OfferResponse> {
     public class Event {
         private OfferResponse mResult;
 
-        public OfferResponse getResult() {
-            return mResult;
-        }
-
         public Event(OfferResponse result) {
             this.mResult = result;
+        }
+
+        public OfferResponse getResult() {
+            return mResult;
         }
     }
 

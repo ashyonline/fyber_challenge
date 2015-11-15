@@ -127,7 +127,6 @@ public class FyberFormModel {
         mDevice = device;
 
         mHashKey = calculateHashKey();
-        mParams.add(new FyberParameter(mHashKey, HASHKEY));
     }
 
     private static String convertToHex(byte[] data) {
@@ -147,7 +146,7 @@ public class FyberFormModel {
         return stringBuffer.toString();
     }
 
-    public static String calculateSha1(String text) {
+    protected static String calculateSha1(String text) {
         MessageDigest messageDigest = null;
         try {
             messageDigest = MessageDigest.getInstance("SHA-1");
@@ -173,8 +172,8 @@ public class FyberFormModel {
         return customParameters.split(",");
     }
 
-    private String calculateHashKey() {
-        String concatenatedExistingParams = getConcatenatedExistingParams();
+    protected String calculateHashKey() {
+        String concatenatedExistingParams = getConcatenatedParams();
 
         // 4. Concatenate the resulting string with & and the API Key handed out to you by Fyber.
         concatenatedExistingParams = concatenatedExistingParams + AND + FyberChallengeApplication.getApiKey();
@@ -183,9 +182,10 @@ public class FyberFormModel {
         return calculateSha1(concatenatedExistingParams);
     }
 
-    private String getConcatenatedExistingParams() {
+    protected String getConcatenatedParams() {
         // 1. Get all request parameters and their values (except hashkey)
         // done in constructor
+        // remove hashkey
 
         // 2. Order theses pairs alphabetically by parameter name
         Collections.sort(mParams, new Comparator<FyberParameter>() {
@@ -206,12 +206,8 @@ public class FyberFormModel {
         return result;
     }
 
-    // Debug method
-    public String getRequestBody() {
-        return getConcatenatedExistingParams();
-    }
-
     public void submit(Context context) {
-        new GetFyberOffersTask(context, mFormat, mAppId, mUid, mLocale, mOsVersion, mTimestamp, mHashKey, mGoogleAdId, mGoogleAdIdLimitedTrackingEnabled, mIp, mPub0, mPage, mOfferTypes, mPsTime, mDevice).execute();
+        new GetFyberOffersTask(context, mFormat, mAppId, mUid, mLocale, mOsVersion, mTimestamp, mHashKey, mGoogleAdId, mGoogleAdIdLimitedTrackingEnabled, mIp, mPub0, mPage, mOfferTypes, mPsTime, mDevice)
+                .execute();
     }
 }

@@ -15,6 +15,7 @@ public class FyberErrorModel {
         mCode = code;
         mErrorDetails = errorMessage;
     }
+
     public String getCode() {
         return mCode;
     }

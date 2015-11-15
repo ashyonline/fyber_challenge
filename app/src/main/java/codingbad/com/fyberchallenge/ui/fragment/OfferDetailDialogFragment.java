@@ -12,8 +12,6 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-// import com.bumptech.glide.Glide;
-
 import com.squareup.picasso.Picasso;
 
 import codingbad.com.fyberchallenge.R;
@@ -21,24 +19,22 @@ import codingbad.com.fyberchallenge.model.Offer;
 import roboguice.fragment.RoboDialogFragment;
 import roboguice.inject.InjectView;
 
+// import com.bumptech.glide.Glide;
+
 /**
  * Created by ayi on 11/12/15.
  */
 public class OfferDetailDialogFragment extends RoboDialogFragment {
 
+    public static final String OFFER = "offer";
     @InjectView(R.id.fragment_offer_details_icon)
     private ImageView mIcon;
-
     @InjectView(R.id.fragment_offer_details_title_value)
     private TextView mTitle;
-
     @InjectView(R.id.fragment_offer_details_teaser_value)
     private TextView mTeaser;
-
     @InjectView(R.id.fragment_offer_details_payout_value)
     private TextView mPayout;
-
-    public static final String OFFER = "offer";
     private Offer mOffer;
 
     public OfferDetailDialogFragment() {
