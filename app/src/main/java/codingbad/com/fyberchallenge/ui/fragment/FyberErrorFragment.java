@@ -13,7 +13,7 @@ import roboguice.inject.InjectView;
 /**
  * Created by ayi on 11/12/15.
  */
-public class FyberErrorFragment extends AbstractFragment<NoOffersFragment.Callbacks> {
+public class FyberErrorFragment extends AbstractFragment<FyberErrorFragment.Callbacks> {
 
     public static final String CODE = "error_code";
     public static final String MESSAGE = "error_message";
