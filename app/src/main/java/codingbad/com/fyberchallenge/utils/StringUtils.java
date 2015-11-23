@@ -38,41 +38,6 @@ public class StringUtils {
         return sb.toString();
     }
 
-    public static String calculateSha1(String text) {
-        MessageDigest messageDigest = null;
-        try {
-            messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(text.getBytes("UTF-8"), 0, text.length());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        byte[] sha1hash = messageDigest.digest();
-        return convertToHex(sha1hash);
-    }
-
-    private static String convertToHex(byte[] data) {
-        StringBuffer stringBuffer = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int twoHalfs = 0;
-            do {
-                if ((0 <= halfbyte) && (halfbyte <= 9)) {
-                    stringBuffer.append((char) ('0' + halfbyte));
-                } else {
-                    stringBuffer.append((char) ('a' + (halfbyte - 10)));
-                }
-                halfbyte = data[i] & 0x0F;
-            } while (twoHalfs++ < 1);
-        }
-        return stringBuffer.toString();
-    }
-
-
     public static String convertToString(InputStream is) {
         return convertToString(new BufferedReader(new InputStreamReader(is)));
     }

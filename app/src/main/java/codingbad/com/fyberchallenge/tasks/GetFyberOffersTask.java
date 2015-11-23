@@ -4,6 +4,9 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -128,7 +131,8 @@ public class GetFyberOffersTask extends RoboAsyncTask<Response> {
         }
 
         String hash = getHeader(HASH_NAME, result);
-        String sha1 = StringUtils.calculateSha1(stringBody + FyberChallengeApplication.getApiKey());
+        String toHash = stringBody + FyberChallengeApplication.getApiKey();
+        String sha1 = new String(Hex.encodeHex(DigestUtils.sha1(toHash)));
         return hash.equals(sha1);
     }
 

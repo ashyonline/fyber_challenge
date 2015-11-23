@@ -2,6 +2,9 @@ package codingbad.com.fyberchallenge.model;
 
 import android.content.Context;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -143,7 +146,7 @@ public class FyberFormModel {
         concatenatedExistingParams = concatenatedExistingParams + AND + FyberChallengeApplication.getApiKey();
 
         // 5. Hash the whole resulting string, using SHA1.
-        return StringUtils.calculateSha1(concatenatedExistingParams);
+        return  new String(Hex.encodeHex(DigestUtils.sha1(concatenatedExistingParams)));
     }
 
     protected String getConcatenatedParams() {
