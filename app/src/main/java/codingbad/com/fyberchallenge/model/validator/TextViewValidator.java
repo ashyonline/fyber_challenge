@@ -25,7 +25,7 @@ public class TextViewValidator {
     }
 
     protected boolean validateFieldIsNotEmpty() {
-        return !mTextView.getText().toString().trim().isEmpty();
+        return mTextView.getText() != null && !mTextView.getText().toString().trim().isEmpty();
     }
 
 }

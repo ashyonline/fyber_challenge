@@ -42,7 +42,7 @@ public class StringUtils {
         MessageDigest messageDigest = null;
         try {
             messageDigest = MessageDigest.getInstance("SHA-1");
-            messageDigest.update(text.getBytes("iso-8859-1"), 0, text.length());
+            messageDigest.update(text.getBytes("UTF-8"), 0, text.length());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return "";
