@@ -1,8 +1,8 @@
 package codingbad.com.fyberchallenge.ui.fragment;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +45,11 @@ import codingbad.com.fyberchallenge.otto.OttoBus;
 import codingbad.com.fyberchallenge.tasks.GetFyberOffersTask;
 import codingbad.com.fyberchallenge.ui.view.LoadingIndicatorView;
 import roboguice.inject.InjectView;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -53,6 +58,7 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
     // hardcoded since I don't have an account
     private static final String PS_TIME = "1312211903";
     private static final java.lang.String ADVANCED_BUTTON_CLICKED = "advanced_button_clicked";
+    private static final String TAG = "rx_tag";
     private static String sGoogleAdvertisingId;
     private static boolean sIsLimited = true;
     @Inject
@@ -337,11 +343,57 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
 
     private void setupGoogleAdInfo() {
         if (sGoogleAdvertisingId == null) {
-            new GetAdvertisingIdInfo().execute();
+            getAdvertisingIdInfoRx();
+            // new GetAdvertisingIdInfo().execute();
         } else {
             mGoogleAdId.setText(sGoogleAdvertisingId);
             mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
         }
+    }
+
+    private void getAdvertisingIdInfoRx() {
+        Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override
+            public void call(Subscriber<? super Void> subscriber) {
+                String mErrorMsg = null;
+
+                try {
+                    sGoogleAdvertisingId = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).getId();
+                    sIsLimited = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).isLimitAdTrackingEnabled();
+                } catch (IOException e) {
+                    mErrorMsg = getString(R.string.google_ad_id_io_exception);
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                    mErrorMsg = getString(R.string.google_ad_id_gps_not_available_exception);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                    mErrorMsg = getString(R.string.google_ad_id_gps_repairable_exception);
+                }
+
+                if (mErrorMsg != null) {
+                    subscriber.onError(new Throwable(mErrorMsg));
+                } else {
+                    subscriber.onNext(null);
+                }
+
+                subscriber.onCompleted();
+            }
+        })
+        .doOnError(new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Log.d(TAG, "doOnError() "+ throwable.getLocalizedMessage());
+            }
+        })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action1<Void>() {
+               @Override
+               public void call(Void aVoid) {
+                   mGoogleAdId.setText(sGoogleAdvertisingId);
+                   mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
+               }
+           });
     }
 
     private void setupOsVersion() {
@@ -416,38 +468,5 @@ public class MainFormFragment extends AbstractFragment<MainFormFragment.Callback
         void onFormSubmittedSuccessfully(OfferResponse response);
 
         void onFormSubmittedWithError(GetFyberOffersTask.FyberError error);
-    }
-
-    private class GetAdvertisingIdInfo extends AsyncTask<Void, Void, Void> {
-        private String mErrorMsg;
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                sGoogleAdvertisingId = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).getId();
-                sIsLimited = AdvertisingIdClient.getAdvertisingIdInfo(getActivity()).isLimitAdTrackingEnabled();
-            } catch (IOException e) {
-                mErrorMsg = getString(R.string.google_ad_id_io_exception);
-            } catch (GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
-                mErrorMsg = getString(R.string.google_ad_id_gps_not_available_exception);
-            } catch (GooglePlayServicesRepairableException e) {
-                e.printStackTrace();
-                mErrorMsg = getString(R.string.google_ad_id_gps_repairable_exception);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            mGoogleAdId.setText(sGoogleAdvertisingId);
-            mIsAdTrackingLimited.setText(String.valueOf(sIsLimited));
-
-            if (mErrorMsg != null) {
-                Toast.makeText(getContext(), mErrorMsg, Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 }
